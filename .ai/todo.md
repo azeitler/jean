@@ -1,3 +1,31 @@
+# Chat message timestamps and a "Last active" session badge
+
+- [x] Confirm no clock timestamp existed in the thread, and that `02:25` is the turn runtime.
+- [x] Add `formatMessageTimestamp` and `formatLastActive` to `src/lib/relative-time.ts`.
+- [x] Extract `MessageMetaLine` and use it in `MessageItem` and `CompactMessageList`.
+- [x] Add the timestamp to user message bubbles.
+- [x] Add the "Last active" badge to `ChatWindow`.
+- [x] Add unit and integration tests, and keep the runtime regression guards.
+- [x] Search GitHub issues and discussions for related reports.
+- [x] Record review results and test steps.
+
+## Review
+
+- The turn runtime is unchanged. `MessageMetaLine` holds the timestamp and the
+  runtime in separate spans, and the runtime keeps its original render condition
+  (`durationMs != null && durationMs > 0`). The existing `getByText('02:25')`
+  assertions still pass and now act as the regression guard.
+- Timestamps show the clock time for messages from today and add the date for
+  earlier days. Zen mode drops the timestamp and keeps the runtime.
+- The "Last active" badge stays hidden below one hour, while the session sends,
+  and on empty sessions. Hours become days at 36 h, so 36 h reads "2 days ago".
+- Three runtime spans were duplicated across two files. They are now one component.
+- Gate results: typecheck, eslint, and 2208 frontend tests pass. One Rust test
+  fails, `windows_console_flash_audit`, from an uncommitted change in
+  `jean-core/src/projects/commands.rs`. It is unrelated to this work.
+
+---
+
 # Add ASD-STE100 to Jean's global system prompt
 
 - [x] Locate the synchronized Rust and TypeScript default prompts.

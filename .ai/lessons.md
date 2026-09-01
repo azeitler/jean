@@ -37,3 +37,22 @@
 - A new streaming backend needs two parser paths: the live response parser and the run-log reconstruction parser.
 - Route persisted runs by the per-run backend or model prefix before using a generic fallback parser.
 - Test history reload with the backend's real NDJSON format. Live streaming success does not prove that the response survives a query refresh or app reload.
+
+## Rank palette and list entries by likely target, not by legacy order
+
+- When a new entity type joins an existing list, do not default to appending it below the old entries only to protect existing muscle memory.
+- Rank by which entry the user most probably wants. In a session-centric app, the last session beats the last project.
+- Surface the ordering trade-off as an explicit choice before implementing, but recommend the likely-target order.
+
+## Confirm the UI element exists before you plan a change to it
+
+- A user who says "the chat shows a timestamp" can be describing something else.
+  In the chat thread the only time-like text was the turn runtime (`02:25`), not a
+  clock time.
+- Grep for the concrete formatting call (`toLocaleTimeString`, `timeStyle`,
+  `getHours`) before you plan an edit to a described element. If it does not exist,
+  say so and give the user numbered options instead of guessing.
+- A duration in `mm:ss` reads like a clock time. Expect this confusion again.
+- When you add a value next to an existing one, keep each in its own element with
+  its own render condition, so the new value cannot swallow the old one. Keep the
+  test that asserts the old value visible - it is the regression guard.
