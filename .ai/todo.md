@@ -1,3 +1,30 @@
+# Sidebar tree: keep workspace expansion + show collapsed count badges
+
+Issue: azeitler/jean#4 (upstream: coollabsio/jean#714, coollabsio/jean#715)
+
+- [x] Add `expanded_worktree_ids` to the Rust `UIState` struct and the TypeScript `UIState` interface.
+- [x] Save, restore, and subscribe to `expandedWorktreeIds` in `useUIStatePersistence`.
+- [x] Add a shared `CollapsedCountBadge` and use it on collapsed folder, project, and workspace rows.
+- [x] Add tests for the badge, the project row, and the persistence hook.
+
+## Review
+
+- `expandedWorktreeIds` was the only tree expansion set that never reached
+  `UIState`. The fix follows the existing project/folder pattern.
+- Worktrees are not loaded when the restore runs, so worktree ids are restored
+  as-is. Ids of removed workspaces stay in the Set but no row reads them.
+- The field is optional in TypeScript and uses `#[serde(default)]` in Rust, so
+  saves written before this change still load.
+- One badge component serves all three rows, so they cannot drift apart.
+- Gates: typecheck, eslint on the changed paths, `cargo fmt --check`,
+  `cargo check` on jean-core, and 2227 frontend tests pass.
+
+## How to test
+
+- Expand a workspace row, quit Jean, start it again - the row stays expanded.
+- Collapse a workspace, project, or folder row - a badge shows the hidden count.
+- Expand the row again - the badge disappears.
+
 # Chat message timestamps and a "Last active" session badge
 
 - [x] Confirm no clock timestamp existed in the thread, and that `02:25` is the turn runtime.

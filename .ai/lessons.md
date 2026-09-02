@@ -56,3 +56,14 @@
 - When you add a value next to an existing one, keep each in its own element with
   its own render condition, so the new value cannot swallow the old one. Keep the
   test that asserts the old value visible - it is the regression guard.
+
+## Send GitHub writes to the fork, never to upstream
+
+- `gh` resolves this repository to the fork parent `coollabsio/jean`, not to
+  `origin` (`azeitler/jean`). A bare `gh issue create` therefore posts upstream.
+- Always pass `--repo azeitler/jean` on write commands: issues, discussions,
+  pull requests, comments, labels, releases.
+- Only target `coollabsio/jean` when the user asks for it in that message.
+- A 404 on a write command against a repository you did not name is the signal
+  that `gh` picked the wrong repository. Check `git remote -v` before you retry.
+- See `CLAUDE.local.md` for the standing rule.
