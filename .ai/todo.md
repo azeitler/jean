@@ -15,8 +15,13 @@
   runtime in separate spans, and the runtime keeps its original render condition
   (`durationMs != null && durationMs > 0`). The existing `getByText('02:25')`
   assertions still pass and now act as the regression guard.
-- Timestamps show the clock time for messages from today and add the date for
-  earlier days. Zen mode drops the timestamp and keeps the runtime.
+- Timestamps show a 24-hour clock time for messages from today ("13:23") and add
+  the date for earlier days ("Sep 1st 26, 13:23"). Zen mode drops the timestamp
+  and keeps the runtime.
+- The runtime carries a unit indicator and no leading zero: "59s", "2:24m",
+  "1:03h". A dot separates the segments of the meta line.
+- Timestamp and runtime share one type scale. MessageSettingsBadges no longer
+  sets its own size, so it inherits from the meta line.
 - The "Last active" badge stays hidden below one hour, while the session sends,
   and on empty sessions. Hours become days at 36 h, so 36 h reads "2 days ago".
 - Three runtime spans were duplicated across two files. They are now one component.
