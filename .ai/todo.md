@@ -1,3 +1,54 @@
+# Pin sessions to a project root
+
+Issue: coollabsio/jean#698. Bug found on the way: azeitler/jean#5.
+
+- [x] Add `PinnedSessionEntry` and `pinned_sessions` to the Rust `ProjectCanvasSettings`.
+- [x] Mirror the field in the TypeScript `ProjectCanvasSettingsState` and the projects store.
+- [x] Add `pinSessionToProject` / `unpinSessionFromProject` with no-op state guards.
+- [x] Save and restore the pins in `useUIStatePersistence`.
+- [x] Add "Pin to Project" / "Unpin from Project" to the shared `SessionContextMenuItems`.
+- [x] Add a shared resolve helper and a `PinnedSessionsSection` component.
+- [x] Render the section on the project canvas and in the sidebar worktree list.
+- [x] Add store, helper, component, menu, persistence, and Rust serde tests.
+
+## Review
+
+- The pins reuse `project_canvas_settings`, the slot that already holds the
+  worktree sort mode and the pinned labels. No new Tauri command, no dispatch
+  entry, and no new field on the session record.
+- A pin stores `{sessionId, worktreeId}`. Both surfaces already know the
+  worktree at pin time, and the worktree lookup doubles as the staleness check.
+- Stale pins are dropped at render time, never pruned from storage. A prune
+  effect would run while the session queries are still loading and would delete
+  valid pins on a slow start. Unarchiving a session brings its row straight back.
+- Both surfaces open a pinned session through `navigateToSession`, the helper
+  the command palette and the unread bell already use.
+- Pinned rows stay out of the canvas keyboard navigation. `flatCards` indexes
+  worktree sections and also drives the 1-9 shortcuts, the drag-reorder ids and
+  the auto-select effects. Session rows there would need a discriminated union
+  in every one of those.
+- Both surfaces read sessions that are already loaded, so the feature adds no
+  data fetch.
+- Gates: typecheck, eslint, `cargo fmt --check`, clippy, 1115 Rust tests and
+  2343 frontend tests pass. Six unrelated component tests time out under full
+  parallel load and pass in isolation; each run fails a different set.
+
+## How to test
+
+- Right-click a session in the sidebar, choose "Pin to Project". The row shows
+  under the project row and at the top of the project canvas.
+- Click a pinned row on either surface. The session opens on its own tab.
+- Right-click a pinned session tab in the chat modal. The item reads "Unpin from
+  Project". Unpin, and the row leaves both surfaces.
+- Pin a session of workspace B while you look at workspace A. The row names B
+  and opens B.
+- Change the canvas filter tab: the section stays. Search: it hides.
+- Press 1-9 and the arrow keys on the canvas: selection walks workspaces only.
+- Restart Jean: the pins stay. `ui-state.json` holds
+  `project_canvas_settings.<projectId>.pinned_sessions`.
+- Archive a pinned session: the row leaves on the next refresh. Unarchive it and
+  the row returns.
+
 # Sidebar tree: keep workspace expansion + show collapsed count badges
 
 Issue: azeitler/jean#4 (upstream: coollabsio/jean#714, coollabsio/jean#715)
