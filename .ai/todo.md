@@ -1,3 +1,15 @@
+# Chat markdown: render image embeds reliably and safely
+
+- [x] `escapeMarkdownImageDestinations` wraps image paths with spaces in `<...>` (skips code).
+- [x] `markdown.tsx`: image-only `urlTransform` (data:image, file:, drive paths), shared `resolveLocalPath`, `MarkdownImage` with `read_file_base64` fallback and placeholder.
+- [x] `convertProjectFileSrc` routes app-data paths to `/api/files` in web mode.
+- [x] Tests: 7 of 8 new renderer tests fail on the old code; 28 markdown tests pass.
+
+## Review
+
+- Raw-HTML sanitizing (`rehype-sanitize`) stays out of scope (user chose option 1).
+- Not checked in the live app: no Jean run-environment tool in this session.
+
 # Sidebar rows: pin glyph and label last
 
 - [x] `PinGlyph` beside `StarGlyph` on workspace session rows and Starred rows; none in the Pinned section.
