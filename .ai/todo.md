@@ -2,7 +2,8 @@
 
 - [x] `create_session` emits a `sessions` cache invalidation (agents over MCP included); `create_base_session` too, since it restores sessions. Source guard test fails without the emit.
 - [x] e2e harness: `get_run_scripts: []` (null crashed every sidebar render) and `list_all_sessions: { entries: [] }` (real shape).
-- [ ] Not done: 25 e2e tests still fail on stale selectors and copy (no "PROJECTS" header, old empty-state text, settings dialog). No CI runs e2e.
+- [x] e2e suite: 30 pass, 2 fixme (was 6 pass, 26 fail). Root causes: the web client maps mod to Control, a worktree click now opens the session modal, New session goes through a picker, terminal tabs are not buttons.
+- [ ] Product: per-session MCP toggles are unreachable in the chat UI (desktop dropdown removed upstream in ec7d9e8f; the compact Settings trigger stays hidden). The two MCP e2e tests are fixme until it is back.
 - [ ] Not done: rare unhandled error attributed to `WorktreeItem.test.tsx` under full-suite load (1 of 4 runs).
 
 # Starred: a star on a session missing from the all-sessions cache never shows
