@@ -67,3 +67,24 @@
 - A 404 on a write command against a repository you did not name is the signal
   that `gh` picked the wrong repository. Check `git remote -v` before you retry.
 - See `CLAUDE.local.md` for the standing rule.
+
+## A new view must fit its chrome, not only render its own content
+
+- When you add a top-level view, check every surrounding surface in that state:
+  side panels, title-bar toggles, sticky rows. The Home view first shipped with
+  the Files panel open beside it, showing only "Select a project or worktree to
+  browse files" - dead space. Gate such a panel on the view, and disable its
+  toggle there, so the toggle never shows "pressed" over nothing.
+- Hide it at render time. Do not write the persisted visibility preference, or
+  the panel stays closed when the user goes back to a project.
+- Align a new sidebar row with its visual neighbours, measured in the browser.
+  Copying one row's classes is not enough when the tree already has two insets:
+  root projects put their glyph at 8px, folders and section headers at 12px.
+  Home copied the project row and so sat 4px left of the headers right under it.
+- Dashboard content belongs in columns that answer to the view's own width
+  (container queries), because the sidebar takes a variable share of the
+  window. Narrow columns need two-line rows; one-line rows with a `shrink-0`
+  context squeeze the name to a few characters.
+- Never turn a query failure into an empty list. An empty feed renders
+  "Nothing yet", which is false, and it caches as a success, so TanStack Query
+  never retries. Rethrow and render a distinct error with a Retry control.
