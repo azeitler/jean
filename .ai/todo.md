@@ -1,3 +1,9 @@
+# Sidebar rows: pin glyph and label last
+
+- [x] `PinGlyph` beside `StarGlyph` on workspace session rows and Starred rows; none in the Pinned section.
+- [x] Label moved after the activity timestamp on workspace session rows.
+- [x] Tests: 4 new behaviour tests fail on the old code; 2561 frontend tests pass.
+
 # Sidebar Pinned/Starred rows: indent and no tree jump
 
 Issues: azeitler/jean#17, azeitler/jean#18.
