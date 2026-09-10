@@ -1,3 +1,43 @@
+# Session sorting (#8) and starred sessions (#12)
+
+Issues: azeitler/jean#8, azeitler/jean#12.
+
+## #8 Per-project session sort
+
+- [x] Pure sort helper in `worktree-sort-utils.ts` (mode + direction, numeric title collation).
+- [x] `sessionSortMode` / `sessionSortDirection` on `ProjectCanvasSettings`: store setter, TS ui-state, Rust struct, persistence, Rust + TS tests.
+- [x] Sort control on the project row next to "Filter sessions".
+- [x] Apply inside each workspace's status groups in `WorktreeItem`.
+- [x] Changelog, commit.
+
+## #12 Starred sessions
+
+- [x] `starred_sessions` + `starred_sessions_collapsed` in Rust `UIState`, TS ui-state, persistence, tests.
+- [x] `starSession` / `unstarSession` / `setStarredCollapsed` on the projects store with guards.
+- [x] Resolver over `useAllSessions()` (star order, archived hidden, never pruned).
+- [x] Extract the Pinned parent row and row list; Pinned keeps its behaviour.
+- [x] Sidebar Starred section under the Home row; Home view Starred section.
+- [x] Star / Unstar in the shared session menu; star glyph on sidebar rows.
+- [x] Invalidate `['all-sessions']` on rename and unarchive.
+- [x] Changelog, commit.
+
+## Decisions (open questions in the issues)
+
+- #8: sort within each workspace's status groups; workspace order and pin order unchanged; per project only.
+- #12: star order (newest star last); context menu only; per machine (UI state); archived stars hidden, not pruned.
+
+## Review
+
+- #8: the sort runs after `groupCardsByStatus`, because that function applies
+  its own in-group order; sorting its input first would be overwritten.
+- #12: stars resolve against `useAllSessions()`, the cache Home, the palette
+  and the unread bell already share, so the feature adds no backend query.
+- #12: `SidebarSectionRow` and `SessionShortcutRows` were extracted from
+  `PinnedSessionsSection`, as #13 asked; its 15 existing tests guard the move.
+- Not done: a live UI check. No Jean run environment tool was available.
+
+---
+
 # Pin sessions to a project root
 
 Issue: coollabsio/jean#698. Bug found on the way: azeitler/jean#5.
