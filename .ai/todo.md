@@ -441,3 +441,13 @@ Issue: azeitler/jean#4 (upstream: coollabsio/jean#714, coollabsio/jean#715)
 - Reload the session. Confirm the separator stays above the same prompt.
 
 ---
+
+## Title bar Back / Go to / Forward (issue azeitler/jean#16)
+
+- [x] Create issue https://github.com/azeitler/jean/issues/16
+- [x] History store (`src/store/navigation-history-store.ts`) and recorder/replay (`src/lib/navigation-history.ts`)
+- [x] Three buttons after the last left title bar button, fixed `ml-4` gap (desktop only)
+- [x] `navigate_back` (`mod+[`) and `navigate_forward` (`mod+]`) keybindings
+- [x] Tests: store, recorder, keybinding round trip
+
+Result: typecheck, ESLint and focused tests pass. Not checked in a live app.
