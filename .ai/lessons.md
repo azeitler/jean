@@ -103,3 +103,15 @@
 - Never turn a query failure into an empty list. An empty feed renders
   "Nothing yet", which is false, and it caches as a success, so TanStack Query
   never retries. Rethrow and render a distinct error with a Retry control.
+
+## When a shared helper gains a side effect, audit every caller
+
+- `navigateToSession` gained a sidebar reveal for CMD+K (#9). The Pinned and
+  Starred rows, which sit inside the sidebar, inherited it: a shortcut click
+  expanded the original workspace and scrolled the tree away (#18).
+- Before adding a side effect to a shared helper, grep every caller and ask
+  whether each one wants it. Where the context differs, add an explicit
+  option with the old behaviour as the default, and pass it at the callers
+  that differ.
+- A shortcut row that repeats an item elsewhere in the same view must not
+  navigate the view to the original.

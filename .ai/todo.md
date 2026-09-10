@@ -1,3 +1,19 @@
+# Sidebar Pinned/Starred rows: indent and no tree jump
+
+Issues: azeitler/jean#17, azeitler/jean#18.
+
+- [x] Nest sidebar pinned rows in the workspace session-list container (`ml-9`/`ml-6`, guide line).
+- [x] Add `revealInSidebar` to `navigateToSession`; pass `false` from the sidebar Pinned and Starred rows.
+- [x] Tests: nesting at both widths, parity with `WorktreeItem`, the no-reveal path, both callers.
+
+## Review
+
+- The jump came from the #9 reveal inside `navigateToSession`, which the
+  shortcut rows inherited. The option skips the expansion and the scroll but
+  keeps `selectWorktree`, so no stale workspace stays highlighted.
+- Canvas, Home, palette, unread bell and Back/Forward keep the reveal.
+- 7 of the new tests fail on the pre-fix code; 2555 frontend tests pass.
+
 # Session sorting (#8) and starred sessions (#12)
 
 Issues: azeitler/jean#8, azeitler/jean#12.
