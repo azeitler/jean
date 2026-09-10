@@ -68,6 +68,21 @@
   that `gh` picked the wrong repository. Check `git remote -v` before you retry.
 - See `CLAUDE.local.md` for the standing rule.
 
+## A click that should land on a view must win over auto-navigation
+
+- Making the sidebar project row call `selectProject()` was not enough to show
+  the project page. `ProjectCanvasView` reopens the last session on mount when
+  `restore_last_session` is on (the default), and a canvas that is already
+  mounted keeps its open session modal. Both made the click look broken for
+  "some projects" only.
+- Before you wire a click to a view, grep the target for mount effects that
+  navigate away (`restore_*`, `autoOpen`, `lastOpened*`) and check the case
+  where the target is already on screen. Check the user's own preferences
+  file too — defaults hide the bug in tests.
+- For a request that must reach a view which may mount later, use a one-shot
+  UI-store flag the view consumes (like `pendingSidebarRevealId`), not a DOM
+  event.
+
 ## A new view must fit its chrome, not only render its own content
 
 - When you add a top-level view, check every surrounding surface in that state:
