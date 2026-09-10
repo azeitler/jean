@@ -68,6 +68,29 @@
   that `gh` picked the wrong repository. Check `git remote -v` before you retry.
 - See `CLAUDE.local.md` for the standing rule.
 
+## A green local gate does not prove a green CI clippy
+
+- CI installs the latest stable Rust (`dtolnay/rust-toolchain@stable`). The local
+  `stable` can be many versions behind, and every new clippy adds lints. The
+  v0.1.73-z.4 build failed on `clippy::unnecessary_sort_by` after `check:all`
+  passed locally on 1.93 while CI ran 1.98.
+- Before a push that cuts a release, run clippy with CI's version. Install it
+  beside the default so nothing else changes:
+  `rustup toolchain install <ver> --profile minimal -c clippy`, then
+  `cargo +<ver> clippy ... -- -D warnings` for jean-core, src-server and
+  src-tauri. The failed CI log names the version in its clippy help URL.
+
+## Verify bulk GitHub writes; `gh` can drop them without an error
+
+- `gh issue close N --comment ...` in a fast loop closed all 12 issues but posted
+  only 3 of the 12 comments. The command exited 0 each time, so nothing showed
+  the loss.
+- After any bulk write, read the result back through the API (for example
+  `gh api repos/<repo>/issues/N/comments`) and count. Space the writes out
+  (a few seconds each) and check each one as you go.
+- Never probe with a real comment on a real issue. If a probe is unavoidable,
+  delete it straight away (`gh api -X DELETE repos/<repo>/issues/comments/<id>`).
+
 ## A click that should land on a view must win over auto-navigation
 
 - Making the sidebar project row call `selectProject()` was not enough to show
