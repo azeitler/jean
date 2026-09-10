@@ -1,3 +1,17 @@
+# Chat links and HTML paths open in the embedded browser
+
+- [x] `chat-links.ts`: classify web / local page / local file; route click, Cmd-click and fallbacks. `resolveLocalPath` moved here from `markdown.tsx`.
+- [x] `MarkdownLink` with ↗ system-browser button; `data-chat-link` skipped by `useExternalLinkInterceptor`.
+- [x] `remarkLocalHtmlLinks`: HTML paths in text and inline code become links; `urlTransform` keeps `file:` hrefs.
+- [x] Jean MCP `open_in_browser` (rate-limited) → `browser:open-url` → `openUrlInWorktreeBrowser`.
+- [x] Tests: 25 new frontend, 4 new Rust; 2662 frontend and 1151 jean-core tests pass; clippy 1.98 clean.
+
+## Review
+
+- Dropped the planned custom URL scheme: a WKWebView `loadRequest` probe loaded a `file://` page with CSS, JS, subfolder and `../` assets.
+- No context-menu items: the ↗ button and Cmd-click cover the system browser.
+- Not checked in the live app: no Jean run-environment tool in this session.
+
 # Chat markdown: render image embeds reliably and safely
 
 - [x] `escapeMarkdownImageDestinations` wraps image paths with spaces in `<...>` (skips code).
