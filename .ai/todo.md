@@ -1,3 +1,16 @@
+# Follow-ups from the Starred investigation
+
+- [x] `create_session` emits a `sessions` cache invalidation (agents over MCP included); `create_base_session` too, since it restores sessions. Source guard test fails without the emit.
+- [x] e2e harness: `get_run_scripts: []` (null crashed every sidebar render) and `list_all_sessions: { entries: [] }` (real shape).
+- [ ] Not done: 25 e2e tests still fail on stale selectors and copy (no "PROJECTS" header, old empty-state text, settings dialog). No CI runs e2e.
+- [ ] Not done: rare unhandled error attributed to `WorktreeItem.test.tsx` under full-suite load (1 of 4 runs).
+
+# Starred: a star on a session missing from the all-sessions cache never shows
+
+- [x] Reproduce: in the e2e harness, starring a session the cache does not hold leaves the Starred section empty.
+- [x] Fix: the Star menu item refreshes `['all-sessions']` after it stars a session.
+- [x] Proof: before/after e2e run (0 vs 1 refetch, section empty vs shown); regression test fails on the old code.
+
 # Chat links and HTML paths open in the embedded browser
 
 - [x] `chat-links.ts`: classify web / local page / local file; route click, Cmd-click and fallbacks. `resolveLocalPath` moved here from `markdown.tsx`.
