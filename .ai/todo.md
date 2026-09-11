@@ -1,3 +1,9 @@
+# Chat markdown: relative paths in the canvas session modal (#19)
+
+- [x] `LocalPathRootContext` in `chat-links.ts`; `resolveLocalPath` / `openChatLink` take a root path, store as fallback.
+- [x] `SessionChatModal` provides its `worktreePath`; `MarkdownImage` and `MarkdownLink` read it.
+- [x] Tests: 2 new tests (store path `null`) fail without the context; 2680 frontend tests pass.
+
 # Follow-ups from the Starred investigation
 
 - [x] `create_session` emits a `sessions` cache invalidation (agents over MCP included); `create_base_session` too, since it restores sessions. Source guard test fails without the emit.

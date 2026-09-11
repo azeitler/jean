@@ -138,3 +138,17 @@
   that differ.
 - A shortcut row that repeats an item elsewhere in the same view must not
   navigate the view to the original.
+
+## "Active worktree" in the store is not the worktree on screen
+
+- Relative image paths in chat resolved against
+  `useChatStore.activeWorktreePath`. Tests passed, but in the app the images
+  showed broken: a session opened from the project canvas renders in
+  `SessionChatModal`, and the canvas clears the store's active worktree. The
+  modal passes its own `worktreePath` prop to `ChatWindow` instead.
+- Before code reads the active worktree from the store, check both chat
+  surfaces: the full `ChatWindow` (store) and the canvas modal (props). The
+  canvas modal is the default way to open a session.
+- Pass the on-screen worktree down (props or a React context such as
+  `LocalPathRootContext`), and keep the store only as a fallback. Test with
+  the store value set to `null`.
