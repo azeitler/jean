@@ -152,3 +152,17 @@
 - Pass the on-screen worktree down (props or a React context such as
   `LocalPathRootContext`), and keep the store only as a fallback. Test with
   the store value set to `null`.
+
+## `bun run fix:all` rewrites the whole repository
+
+- `fix:all` runs `eslint . --fix` and `prettier --write .`, both across every
+  file. The repository is not Prettier-clean (`check:all` has no
+  `format:check` step), so one run reformatted about 155 unrelated files and
+  buried a 14-file change.
+- Format only the files the change touches:
+  `bunx prettier --write <paths>` and `bunx eslint --fix <paths>`.
+- Use `bun run check:all` to verify. It never writes.
+- If a whole-repo write already happened, list the intended files, then
+  `git diff --name-only | grep -vxFf keep.txt` and `git checkout --` the rest.
+  Never `git reset --hard`. Untracked files cannot be restored this way, so
+  check their timestamps before assuming they survived.
