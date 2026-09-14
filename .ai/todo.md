@@ -544,3 +544,55 @@ was available.
   backend in web access). Pin a session: an error toast comes up and the pin
   goes away again. Repeat for Star and Unstar.
 - With a failing write, drag the sidebar. No toast comes up (layout stays silent).
+
+---
+
+## Restore a cancelled prompt to the chat input (upstream coollabsio/jean#725)
+
+Root cause: the backend and the frontend disagreed. `send_chat_message` throws a
+cancelled turn away when the run made no output — it sets
+`assistant_message_id = None`, which makes the run non-renderable, and pops the
+user message. Its own comment says this is done so the frontend can restore the
+text. But the frontend only restored on `chat:cancelled` with `undo_send: true`,
+and the registry sets that flag only when no process ever started. A cancel of a
+live run always sends `false`. The prompt was therefore lost from the history and
+from the input.
+
+Do not fix this by loosening the frontend rule to `undo_send || !hasContent`.
+`hasContent` is a frontend guess and is false while the backend still holds output
+the frontend never received. Upstream tried it, and reverted it in `a66fb1c6`
+because it duplicated the prompt and brought image attachments back (upstream
+issue #671, PR #717).
+
+- [x] `jean-core/src/chat/claude.rs` — `UndoSendEvent` payload
+- [x] `jean-core/src/chat/commands.rs` — emit `chat:undo-send` from the one branch
+      that discards the turn, with the run id and the message
+- [x] `jean-core/src/http_server/mod.rs` — buffer the event for a web reload
+- [x] `src/types/chat.ts` — `UndoSendEvent` type
+- [x] `src/components/chat/hooks/useStreamingEvents.ts` — `chat:undo-send` listener:
+      skips a queued session, skips a non-empty draft, prefers `lastSentMessages`,
+      falls back to `stripAllMarkers(user_message)`, restores attachments, and
+      drops the stale turn from the query cache
+- [x] Tests: four new cases; the two `chat:cancelled` regression tests are unchanged
+
+Result: typecheck, ESLint, clippy, `jean-core` rustfmt, 2805 frontend tests and
+1285 Rust tests pass. Not checked in a live app: no Jean run environment was
+available.
+
+Known gaps, not addressed: a steered prompt never sets `lastSentMessage`;
+`cancel_processes_for_worktree` cancels idle sessions; the `chat:error` restore has
+no empty-draft guard; app quit does not cancel or emit.
+
+## How to test
+
+- Send a prompt, then press stop as soon as the spinner starts, before the first
+  word of the answer. The prompt comes back into the input, with its images.
+- Send a prompt with an image, let it answer for some seconds, then press stop.
+  The part of the answer stays in the history. The input stays empty.
+- Send a prompt, press stop, then type new text quickly. Your new text stays.
+- Send a prompt, type a second prompt to queue it, then press "Skip to Next".
+  The input stays empty and the queued prompt runs.
+- Send a prompt, then cancel it with the MCP `cancel_session_run` tool, or from
+  another client. The prompt still comes back.
+- Reload the window between the cancel and the restore. The prompt still comes
+  back, because the event carries the text.
