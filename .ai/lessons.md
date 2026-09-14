@@ -166,3 +166,33 @@
   `git diff --name-only | grep -vxFf keep.txt` and `git checkout --` the rest.
   Never `git reset --hard`. Untracked files cannot be restored this way, so
   check their timestamps before assuming they survived.
+
+## `emit_to` a window label does nothing on its own (Tauri v2)
+
+- A JS listener registered with `listen(event, cb)` and no options registers
+  `EventTarget::Any`, and `match_any_or_filter` short-circuits every emit
+  filter. So switching Rust from `emit` to `emit_to(webview_window(label), …)`
+  still delivers the event to every window.
+- Both halves are needed: emit to the label **and** register the listener with
+  `{ target: label }`. See `listenMenu` in `src/lib/transport.ts` and
+  `install_menu_events` in `src-tauri/src/lib.rs`.
+
+## A window built at runtime ignores `tauri.conf.json`
+
+- `app.windows[0]` only describes the window Tauri creates at startup. A
+  `WebviewWindowBuilder` has to repeat `minInnerSize`, `titleBarStyle`,
+  `hiddenTitle` and the drag-drop handler, or the new window behaves
+  differently from `main`.
+- The builder method for `"dragDropEnabled": false` is
+  `disable_drag_drop_handler()`, not `drag_drop_enabled(false)`.
+- Reach the caller's window with a `window: tauri::Window` command parameter
+  instead of `app.get_webview_window("main")`. Tauri injects it.
+
+## `localStorage` is stubbed in the test setup
+
+- `src/test/setup.ts` replaces `window.localStorage` with `getItem: vi.fn(() =>
+null)`. Writing with `setItem` and reading it back returns `null`, so a test
+  that needs real storage has to drive the mock with its own `Map`.
+- Not every test has a full `window`. `vi.stubGlobal('window', { open: ... })`
+  in `src/lib/platform.test.ts` has no `location`, so module-init code must use
+  `window.location?.search`.
