@@ -519,3 +519,28 @@ Issue: azeitler/jean#4 (upstream: coollabsio/jean#714, coollabsio/jean#715)
 - [x] Tests: store, recorder, keybinding round trip
 
 Result: typecheck, ESLint and focused tests pass. Not checked in a live app.
+
+---
+
+## Error notification for a failed pin or star (issue azeitler/jean#25)
+
+- [x] `saveUIStateNow` in `src/services/ui-state.ts` — one write path, reports the outcome
+- [x] `src/lib/ui-state-flush.ts` — serialized immediate write, snapshot at write time, no write before hydration
+- [x] `src/lib/ui-state-snapshot.ts` — `getCurrentUIState` moved out of the hook (verbatim)
+- [x] `src/components/chat/session-pin-actions.ts` — the four toggles revert and toast on failure
+- [x] `isWsDisconnectError` moved to `src/lib/query-error.ts`
+- [x] Tests: flush, actions, menu regression, `isWsDisconnectError`; two existing pin tests updated
+
+Result: typecheck, ESLint, Prettier and the full frontend suite (2735 tests)
+pass. Rust is untouched. Not checked in a live app: no Jean run environment
+was available.
+
+## How to test
+
+- Right-click a session, then "Pin to Project". The pin stays and no toast
+  comes up. Restart Jean: the pin is still there.
+- Make the write fail (`chmod 444` on
+  `~/Library/Application Support/com.jean.desktop/ui_state.json`, or stop the
+  backend in web access). Pin a session: an error toast comes up and the pin
+  goes away again. Repeat for Star and Unstar.
+- With a failing write, drag the sidebar. No toast comes up (layout stays silent).
