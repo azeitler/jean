@@ -196,3 +196,42 @@ null)`. Writing with `setItem` and reading it back returns `null`, so a test
 - Not every test has a full `window`. `vi.stubGlobal('window', { open: ... })`
   in `src/lib/platform.test.ts` has no `location`, so module-init code must use
   `window.location?.search`.
+
+## A short follow-up like "can we try this with X?" is not a licence to guess
+
+- A pronoun with no antecedent in the visible transcript means the context is
+  gone, not that I should reconstruct the intent from the working tree. Reading
+  git status plus the newest task file gives a plausible task, not the task.
+- Ask which "this" is meant. One question costs a turn; a wrong guess costs a
+  whole implementation, a real CLI run, and a revert.
+- Untracked work has no safety net. `git checkout`/`restore` cannot undo an edit
+  to a `??` file, so the only copy of the original is whatever I read earlier in
+  the session. Read the whole file before editing it, and prefer reversing each
+  edit precisely over rewriting the file from memory.
+- `len(str)` counts characters, `wc -c` counts bytes. Do not conclude that a
+  revert lost data because the two disagree on a file holding non-ASCII text.
+
+## A file path I put in chat resolves against the worktree root, not the folder I am working in
+
+- `openChatLink()` has no notion of a "current directory". A bare
+  `01-plain.html` in an answer becomes `<worktree>/01-plain.html`. When I create
+  files in a subfolder and then list them, I must write the path from the
+  worktree root: `scratch/browser-fixtures/01-plain.html`.
+- A markdown table of bare file names therefore produces a table of dead links,
+  and the user reads that as a product bug.
+- Inline code with a space in it is never autolinked (a command and a name with
+  a space read the same), so a name with a space needs an explicit markdown
+  link: `[04 report.html](<scratch/x/04 report.html>)`.
+
+## Do not guess what a web view does with a file type — probe it
+
+- A 40-line Swift `WKWebView` script with a `WKNavigationDelegate` answers
+  "does this render, what MIME type, does the load finish" in one run, for
+  every extension at once. `swift script.swift path...` needs no project.
+- It found two things reading the code never would have: a movie reports the
+  navigation as **failed** (`WebKitErrorDomain 204`) although it plays, and a
+  `file://` text document is decoded as **Latin-1**, so UTF-8 Markdown shows
+  mojibake. Both changed the design.
+- Check the control case in the same run. The `.xhtml` fixture showed its
+  em-dash correctly, which proved the mojibake was WebKit's decoding and not my
+  probe's output encoding.
