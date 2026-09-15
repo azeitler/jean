@@ -91,6 +91,7 @@
 - Trace the exact component and every state source that can keep a running indicator visible.
 - Add a regression test for the user-visible open-session state, not only a nearby cache with similar data.
 - When UI rendering defers a resource ID, defer its owner and routing context as one value. Never combine a previous server resource ID with the new server's worktree or path.
+- If a switched chat shows an incomplete tool or running state, do not conclude that stale query routing is the full cause. Compare WebSocket event decoration and replay with the persisted session response before selecting the fix.
 
 ## Test completion as one lifecycle, including selection
 
