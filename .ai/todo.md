@@ -1,15 +1,16 @@
-# Disable Local Editor Opens for Remote Files
+# Open Remote Files in the Configured Editor
 
 - [x] Trace the file modal editor-open route and identify the local dispatch.
 - [x] Add a failing regression test for a remote-owned file.
-- [x] Hide the local external-editor action for remote-owned files.
+- [x] Route explicit remote file ownership through the remote editor mapping.
+- [x] Keep Open in Editor visible for remote-owned files.
 - [x] Run focused tests and `bun run check:all`.
 - [x] Record review and verification results.
 
 ## Review
 
-- Remote-owned files keep Jean's inline Edit action but no longer show the local Open in Editor action.
-- Local-owned files still show Open in Editor when the runtime supports it.
-- The focused component suite passed: 3 tests.
-- TypeScript, ESLint, Rust formatting, Rust Clippy, and all 2,363 frontend tests passed in `bun run check:all`.
-- Rust tests did not start because of an unrelated existing missing `sentry_base_url` field in `jean-core/src/projects/commands.rs:15299`.
+- Open in Editor remains visible for remote-owned files.
+- The modal now sends explicit server ownership to the transport layer.
+- Native remote files use the same SSH editor mapping as remote worktrees.
+- The 34 focused modal and transport tests passed.
+- TypeScript passed in `bun run check:all`; the full check then stopped on unrelated concurrent JSX corruption in dashboard and worktree files.
