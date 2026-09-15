@@ -1,16 +1,14 @@
-# Open Remote Files in the Configured Editor
+# Task: Add clone provider selector
 
-- [x] Trace the file modal editor-open route and identify the local dispatch.
-- [x] Add a failing regression test for a remote-owned file.
-- [x] Route explicit remote file ownership through the remote editor mapping.
-- [x] Keep Open in Editor visible for remote-owned files.
-- [x] Run focused tests and `bun run check:all`.
-- [x] Record review and verification results.
+- [x] Review the existing select component and clone form tests
+- [x] Add failing tests for GitHub, GitLab, and Custom URL handling
+- [x] Add the provider selector and URL construction
+- [x] Run focused and full frontend verification
+- [x] Review the diff and record results
 
 ## Review
 
-- Open in Editor remains visible for remote-owned files.
-- The modal now sends explicit server ownership to the transport layer.
-- Native remote files use the same SSH editor mapping as remote worktrees.
-- The 34 focused modal and transport tests passed.
-- TypeScript passed in `bun run check:all`; the full check then stopped on unrelated concurrent JSX corruption in dashboard and worktree files.
+- GitHub is the default provider and accepts `owner/repository`.
+- GitLab accepts group and nested-group repository paths.
+- Custom keeps the previous unrestricted full-URL behavior.
+- TypeScript, focused ESLint checks, 12 focused tests, and all 2,381 frontend tests passed.
