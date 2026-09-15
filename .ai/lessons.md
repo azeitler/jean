@@ -1,5 +1,10 @@
 # Lessons
 
+## Preserve alignment when simplifying controls
+
+- When a user asks to simplify a footer control to an icon, keep its existing side alignment unless the user explicitly asks to center it.
+- In a sidebar footer, keep a single action in the normal left-side position.
+
 ## Use stable, owner-aware resource identities
 
 - Values, query keys, command arguments, and persisted references must include a stable resource ID and its owner when IDs are not globally unique.
@@ -85,8 +90,13 @@
 - Distinguish a stale canvas or list status from a stale status inside the open session.
 - Trace the exact component and every state source that can keep a running indicator visible.
 - Add a regression test for the user-visible open-session state, not only a nearby cache with similar data.
+- When UI rendering defers a resource ID, defer its owner and routing context as one value. Never combine a previous server resource ID with the new server's worktree or path.
 
 ## Test completion as one lifecycle, including selection
 
 - A completion fix must verify the open-session indicator and the active session ID together.
 - Cache invalidation can affect both status data and automatic selection effects; test that completion never changes the user's current session.
+
+- When fixing UI flicker, removing duplicate requests is not sufficient. Verify the actual first-paint and transition behavior. If the user reports that one header field appears late, test the rendered visibility gate, not only the data source wiring.
+
+- When a remote attachment works for the backend but not in the UI, verify both upload routing and client preview URL ownership. A remote filesystem path is not directly loadable by the native webview; render it through the owning server file URL.
