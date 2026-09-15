@@ -79,3 +79,14 @@
 - For production-readiness reviews, classify every gap as either implementable in Jean or unavailable in the external backend.
 - Do not mark work complete while implementable items remain.
 - Report verification limits separately from implementation limits.
+
+## Reproduce the exact visible state before selecting a cache fix
+
+- Distinguish a stale canvas or list status from a stale status inside the open session.
+- Trace the exact component and every state source that can keep a running indicator visible.
+- Add a regression test for the user-visible open-session state, not only a nearby cache with similar data.
+
+## Test completion as one lifecycle, including selection
+
+- A completion fix must verify the open-session indicator and the active session ID together.
+- Cache invalidation can affect both status data and automatic selection effects; test that completion never changes the user's current session.
