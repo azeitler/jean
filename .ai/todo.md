@@ -1,17 +1,36 @@
-# PR #650 investigation and fix
+# Consolidate context injection actions
 
-- [x] Read PR metadata, reviews, checks, and changed files.
-- [x] Trace avatar storage and display behavior; identify correctness and security risks.
-- [x] Add or adjust regression tests before implementation where needed.
-- [x] Implement the smallest root-cause fix.
+## Match sidebar separator colors
+
+- [x] Add a failing regression test for both desktop sidebar separators.
+- [x] Use the subdued project-sidebar divider color for both separators.
 - [x] Run focused tests and quality checks.
-- [x] Record review findings and verification results.
+- [x] Record the result and manual test steps.
+
+- [x] Add failing desktop and mobile menu tests.
+- [x] Keep one context injection action and label it "Inject Context".
+- [x] Run focused tests and quality checks.
+- [x] Record review and manual test steps.
+
+## Native/mobile parity follow-up
+
+- [x] Add failing parity tests for all native Magic options.
+- [x] Add missing Link PR and Advisory actions to mobile Web Access.
+- [x] Match the native Release action labels.
+- [x] Run focused tests and quality checks.
+
+### Follow-up review
+
+- Native and mobile Web Access now expose the same 20 Magic actions.
+- Link PR uses the existing native dialog logic through a focused UI event.
+- Advisory follows the existing mobile investigation event flow and is disabled without loaded advisory context.
 
 ## Review
 
-- PR intent is correct: fresh avatar paths invalidate file-URL caches.
-- Fixed a data-loss case: a failed replacement copy no longer deletes the current avatar.
-- Project existence is now checked before file-system changes.
-- Cleanup keeps the new destination and only recognizes UUID-form replacement names or the legacy exact prefix form.
-- No dependency, credential, network, command-execution, auth, or deserialization changes were found.
-- Verified focused Rust and frontend tests, TypeScript typecheck, ESLint, and `git diff --check`.
+- The left-sidebar and file-browser resize separators now use `border/40`, matching the subdued project-sidebar divider.
+- The focused separator test, ESLint, and TypeScript typecheck pass.
+- Manual check: open Jean on desktop and compare the vertical sidebar divider with the horizontal divider above the project list.
+- Desktop Magic now shows one "Inject Context" action with the J shortcut.
+- The mobile Magic menu uses the same label, icon, shortcut, and existing context-picker handler.
+- Focused component tests, ESLint, TypeScript typecheck, and diff checks pass.
+- Manual check: open Magic on desktop and mobile, then select Inject Context and confirm that the context picker opens on the Sessions list.
