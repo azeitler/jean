@@ -1,15 +1,15 @@
-# Disable Steering by Default
+# Disable Local Editor Opens for Remote Files
 
-- [x] Add regression tests for queue-first defaults.
-- [x] Change Rust and TypeScript steering defaults and fallbacks.
-- [x] Update related comments and setting fallbacks.
-- [x] Run focused tests and quality checks.
+- [x] Trace the file modal editor-open route and identify the local dispatch.
+- [x] Add a failing regression test for a remote-owned file.
+- [x] Hide the local external-editor action for remote-owned files.
+- [x] Run focused tests and `bun run check:all`.
 - [x] Record review and verification results.
 
 ## Review
 
-- Codex, OpenCode, PI, and Grok now queue prompts by default.
-- Explicitly enabled steering continues to steer running turns.
-- Missing persisted fields deserialize to queue-first defaults; existing explicit values remain unchanged.
-- All 2,361 frontend tests, TypeScript, ESLint, Rust formatting, and Rust Clippy passed.
-- Rust tests could not start because an unrelated existing `Project` test initializer in `jean-core/src/projects/commands.rs:15299` is missing `sentry_base_url`.
+- Remote-owned files keep Jean's inline Edit action but no longer show the local Open in Editor action.
+- Local-owned files still show Open in Editor when the runtime supports it.
+- The focused component suite passed: 3 tests.
+- TypeScript, ESLint, Rust formatting, Rust Clippy, and all 2,363 frontend tests passed in `bun run check:all`.
+- Rust tests did not start because of an unrelated existing missing `sentry_base_url` field in `jean-core/src/projects/commands.rs:15299`.
