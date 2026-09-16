@@ -1,15 +1,26 @@
-# Task: Scope models and favorites to the active Jean server
+# Task: Fix background investigation startup
 
-- [x] Trace model discovery and favorite persistence for local and remote connections.
-- [x] Add a failing regression test for remote-server isolation.
-- [x] Implement the smallest owner-aware fix.
+## Plan
+- [x] Trace background investigation from UI action through server routing and prompt dispatch.
+- [x] Add a failing regression test for multi-instance routing and initial prompt delivery.
+- [x] Implement the smallest root-cause fix.
 - [x] Run focused tests and `bun run check:all`.
-- [x] Record verification and review results.
+- [x] Record the result and test steps.
 
 ## Review
-
-- Chat windows now derive the Jean server from the scoped worktree ID and provide that owner to preferences and model hooks.
-- Backend installation checks, model queries, favorites, fast-mode choices, OpenCode refresh, and PI default-model synchronization use the owning server.
-- Query keys include the server ID so cached local model data cannot appear in a remote session.
-- Focused frontend tests passed (41 tests), typecheck passed, lint passed, Rust formatting passed, Clippy passed, and all 2,387 frontend tests passed.
-- `bun run check:all` reached Rust tests, then stopped on the unrelated existing `Project` test initializer at `src/projects/commands.rs:15299`, which is missing the new `sentry_base_url` field.
+- Root cause: multi-instance routing did not scope the nested worktree in
+  `worktree:created` events. The optimistic scoped worktree stayed `pending`, so
+  the background hook sometimes never reached prompt dispatch. The behavior
+  depended on which transport delivered the event. The investigation command
+  result also returned raw session/worktree IDs, which split prompt and stream
+  state from the scoped session.
+- Fix: make remote worktree lifecycle events owner-aware, including nested
+  worktrees, decorate both IDs in the investigation command result, and wake
+  the investigation hook directly when the current project's cached worktree
+  changes from pending to ready.
+- Regression: routing tests failed with raw worktree/session IDs before each
+  fix and now cover both the readiness event and command response boundaries.
+- Verification: focused Vitest suites pass. `bun run check:all`
+  passed typecheck, lint, formatting, Clippy, and all 2,388 frontend tests. Its
+  Rust-test phase stopped on an unrelated existing `Project` test initializer
+  that is missing `sentry_base_url` in `jean-core/src/projects/commands.rs`.
