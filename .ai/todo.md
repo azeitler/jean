@@ -1,26 +1,23 @@
-# Task: Fix background investigation startup
+# Fix Web Access live-session history hydration
 
-## Plan
-- [x] Trace background investigation from UI action through server routing and prompt dispatch.
-- [x] Add a failing regression test for multi-instance routing and initial prompt delivery.
+- [x] Trace native-to-Web Access session open and streaming data flow.
+- [x] Add a failing regression test for loading persisted history before live chunks.
 - [x] Implement the smallest root-cause fix.
 - [x] Run focused tests and `bun run check:all`.
-- [x] Record the result and test steps.
+- [x] Record verification and review results.
 
 ## Review
-- Root cause: multi-instance routing did not scope the nested worktree in
-  `worktree:created` events. The optimistic scoped worktree stayed `pending`, so
-  the background hook sometimes never reached prompt dispatch. The behavior
-  depended on which transport delivered the event. The investigation command
-  result also returned raw session/worktree IDs, which split prompt and stream
-  state from the scoped session.
-- Fix: make remote worktree lifecycle events owner-aware, including nested
-  worktrees, decorate both IDs in the investigation command result, and wake
-  the investigation hook directly when the current project's cached worktree
-  changes from pending to ready.
-- Regression: routing tests failed with raw worktree/session IDs before each
-  fix and now cover both the readiness event and command response boundaries.
-- Verification: focused Vitest suites pass. `bun run check:all`
-  passed typecheck, lint, formatting, Clippy, and all 2,388 frontend tests. Its
-  Rust-test phase stopped on an unrelated existing `Project` test initializer
-  that is missing `sentry_base_url` in `jean-core/src/projects/commands.rs`.
+
+- Root cause: Web Access can receive live chunks before `get_session` finishes.
+  `ChatWindow` then saw live state and skipped the persisted running snapshot,
+  so output produced before the browser opened was absent.
+- Fix: always merge the persisted running snapshot into live stream state. The
+  existing merge and replay-deduplication logic keeps overlapping output unique.
+- Regression: the new assertion failed with the old early return and passes now.
+- Verification: 31 focused tests passed. TypeScript typecheck, ESLint, Rust
+  formatting, Clippy, and all 2,390 frontend tests passed through
+  `bun run check:all`. The existing Rust test compile error remains:
+  `Project` is missing `sentry_base_url` in
+  `jean-core/src/projects/commands.rs:15299`.
+- Live UI verification was not available because Jean reported no running
+  environment for this repository.
