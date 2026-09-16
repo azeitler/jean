@@ -1,18 +1,17 @@
-# Task: Fix Web Access background-investigation crash
+# Investigate issue model selector in Web Access
 
-- [x] Trace the crash to the background-investigation cache listener.
-- [x] Limit the listener to real query data updates.
-- [x] Keep remote worktree and investigation IDs owner-aware.
-- [x] Show expandable, copyable crash details in production.
-- [x] Run focused verification.
+- [x] Trace the investigate-issue dialog and model selector conditions.
+- [x] Compare native desktop, Web Access, and mobile behavior.
+- [x] Review existing regression coverage for Web Access.
+- [x] Run focused tests for both investigate entry points.
+- [x] Record the review result and verification evidence.
 
 ## Review
 
-- The query cache emits observer lifecycle notifications as well as data
-  updates. Treating all events as readiness changes could cause a render loop
-  in Web Access.
-- The listener now reacts only to `updated` events for worktree queries.
-- The app-level crash screen now exposes the actual error and stack trace so a
-  Web Access user can copy the failure details.
-
-- Verification: TypeScript, ESLint, diff checks, and 28 focused tests passed.
+- The current source shows the backend/model selector in Web Access, native desktop, and mobile.
+- `NewWorktreeModal` renders `DesktopBackendModelPicker` for the Issues and PRs tabs without an `isNativeApp()` condition.
+- `MagicModal` renders the "Choose backend + model" controls without a platform condition.
+- Existing tests explicitly cover native desktop, Web Access, and mobile model selection.
+- Focused verification passed: 2 test files, 22 tests.
+- No Run environment was available for browser verification.
+- No production code change was required. A deployed Web Access client that lacks the selector is likely serving an older frontend bundle or cached page.
