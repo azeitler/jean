@@ -235,3 +235,15 @@ null)`. Writing with `setItem` and reading it back returns `null`, so a test
 - Check the control case in the same run. The `.xhtml` fixture showed its
   em-dash correctly, which proved the mojibake was WebKit's decoding and not my
   probe's output encoding.
+
+## An end-to-end test that skips Jean's stream parser proves nothing about the UI
+
+- The Claude dialog harness passed a "real chain" test (real CLI, real shim, real socket) and still failed in the app: the plan was never presented. The test drove the CLI directly, so Jean's own stream consumer in `chat/claude.rs` never ran — and that consumer SIGKILLed the CLI on `ExitPlanMode`'s first, empty `input_json_delta`.
+- Before claiming a chat UI flow works, replay a **real** CLI stream (with the same flags Jean passes, including `--include-partial-messages`) through the consumer logic. `scripts/claude-dialog-rig/replay_kill_paths.py` does this for the blocking-tool paths.
+- Legacy code paths written while a feature was unreachable were never exercised. Re-read every handler that names the restored tools (`grep '"ExitPlanMode"'`) before shipping a restoration.
+- CLI streaming behaviour drifts between versions: 2.1.231 streamed `ExitPlanMode`'s plan as deltas, 2.1.273 streams an empty input and injects `plan`/`planFilePath` into the final assistant message. Test against the version users run.
+- When reading a stream-json log, find the `system/init` message by type — do not assume it is line 1. A `rate_limit_event` can come first and silently turn a present tool into an "absent" one.
+
+## Complete a task by its name, not its number
+
+- `bun run task:complete 1` moved a different `task-1-…` file: several tasks can share a priority number, and the script takes the first match. Always pass the unique name (`bun run task:complete restore-claude-dialog-tool-harness`) and check `git status docs/` afterwards.
