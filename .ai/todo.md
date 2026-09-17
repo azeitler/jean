@@ -1,28 +1,17 @@
-# Issue #696 investigation and fix
+# Issue #699: MCP session controls
 
-- [x] Read the full issue and trace headless process creation.
-- [x] Identify the unreaped child lifecycle and regression source.
-- [x] Add failing process-reaping regression coverage.
-- [x] Implement the smallest root-cause fix.
+- [x] Trace MCP schemas, session persistence, send resolution, and message reconstruction.
+- [x] Check git history to classify the regression or missing feature.
+- [x] Add failing tests for MCP settings schema and message provider metadata.
+- [x] Implement the smallest complete fix across MCP, persistence, and history APIs.
 - [x] Run focused tests and `bun run check:all`.
-- [x] Record findings, risks, and test steps.
+- [x] Review the diff and document findings, risks, and test steps.
 
 ## Review
 
-- Root cause: Kimi and Grok ACP authentication checks killed their Node CLI
-  children but did not call `wait()`. Repeated web status checks therefore left
-  exited direct children as zombies on Linux. Some cancellation and timeout
-  paths used the same unsafe lifecycle.
-- Regression: Grok introduced this lifecycle in June 2026. Kimi duplicated it
-  in commit `e1feb487f` on 2026-07-17. Version 0.1.72 contains both paths.
-- Fix: `kill_and_reap()` centralizes termination plus collection. Kimi, Grok,
-  Antigravity, and detached-launch error paths now use it where they own a child.
-- Tests: the process helper test checks for kernel `ECHILD` after cleanup. The
-  Kimi ACP test runs three fake authentication children and verifies that every
-  direct child is reaped.
-- Verification: `bun run check:all` passed, including 353 TypeScript test files
-  (2,397 tests), 1,205 jean-core tests, 14 desktop tests, formatting, lint,
-  TypeScript checks, and Rust clippy.
-- Incidental repair: one existing `Project` test fixture lacked the required
-  `sentry_base_url` field and prevented Rust test compilation. It now sets the
-  field to `None`.
+- Root cause: the shared send path already inherited persisted session choices, but the MCP registry only exposed model and execution mode. Existing session setters were not available as one complete MCP control surface.
+- Added `set_session_settings` for persistent backend, provider, model, fast mode, effort, thinking, and execution mode selection. Added `get_session_capabilities` and one-turn send overrides with synchronous enum validation.
+- Added run provider/profile metadata to reconstructed user messages and displayed it with the existing message setting badges.
+- Expanded MCP session creation to all current chat backends and documented status polling for asynchronous send failures.
+- Added the missing `sentry_base_url` field to an existing Project test fixture so the required Rust test gate can compile.
+- Verification: `bun run check:all` passed (353 frontend files / 2398 tests, 1204 jean-core tests, 14 Tauri library tests).
