@@ -474,12 +474,14 @@ Issue: azeitler/jean#4 (upstream: coollabsio/jean#714, coollabsio/jean#715)
 - Use an Antigravity browser, task, subagent, terminal, or knowledge-base operation. Confirm it has a human-readable label and expandable details.
 
 ## 2026-08-09 — Antigravity selectable everywhere
+
 - [x] Default backend (Settings General + project General) offers Antigravity when installed
 - [x] Magic Prompts backend/model/effort + auto-defaults preset for Antigravity
 - [x] Backend/model picker, MagicModal, ResolveConflicts, onboarding, search, MCP panes
 - [x] Chat hooks: routing, effort, plan approval, hydration, labels, non-steerable queue
 - [x] Rust: default_model_for_backend, jean_mcp_core backend lists, checkpoints, handoff, run_log plan injection
 - [x] Verified: typecheck, eslint, clippy (lib), 2043 frontend tests, antigravity+module Rust tests
+
 # Keep backend switch indicator on the changed prompt (2026-08-09)
 
 - [x] Trace the persisted per-prompt backend data and reproduce the delayed separator.
@@ -596,3 +598,28 @@ no empty-draft guard; app quit does not cancel or emit.
   another client. The prompt still comes back.
 - Reload the window between the cancel and the restore. The prompt still comes
   back, because the event carries the text.
+
+## Resolve chat file references against session evidence (2026-09-20)
+
+A relative path in a chat answer, or an `@`-mention, resolved by one blind
+join onto the worktree root. Wrong for a monorepo subdirectory, a linked
+project, a path a tool printed relative to its own cwd, or a file that moved.
+Nothing checked the file existed, so a dead reference looked like a live link.
+
+- [x] Rust `resolve_file_reference(reference, candidates, searchRoot)` in
+      `jean-core/src/projects/commands.rs`: stat each candidate in order, fall
+      back to a bounded suffix search under the worktree
+- [x] Register in `dispatch.rs` (jean-core command — dispatch arm only)
+- [x] `src/lib/file-reference.ts`: candidate builder + evidence registry
+      (a module Map keyed by worktree root, not a React context — a provider
+      element around ChatWindow's tree re-indents 2,400 lines of it)
+- [x] Evidence = absolute paths from `message.tool_calls[].input.file_path`
+      (newest first), then worktree/linked-project roots
+- [x] `useFileReference()` hook: resolving / found / ambiguous / missing
+- [x] `MarkdownLink`: no link when missing, picker when ambiguous
+- [x] `FileMentionBadge`: same resolution, disabled badge when missing
+- [x] `openChatLink` accepts a resolved path
+- [x] Invalidate `['file-reference']` when a turn finishes
+- [x] Rust + TS tests, docs, changelog
+- [x] Proof: 6 Rust tests, 26 frontend tests. 2928 frontend tests pass apart
+      from the 3 model-picker failures that predate this work.
