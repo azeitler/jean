@@ -247,3 +247,16 @@ null)`. Writing with `setItem` and reading it back returns `null`, so a test
 ## Complete a task by its name, not its number
 
 - `bun run task:complete 1` moved a different `task-1-…` file: several tasks can share a priority number, and the script takes the first match. Always pass the unique name (`bun run task:complete restore-claude-dialog-tool-harness`) and check `git status docs/` afterwards.
+
+## Diff a shared file before staging it whole
+
+- `git add CHANGELOG.md` swept another session's uncommitted keychain entry into my commit, although its code was not committed. Caught it before the push only because a later grep looked for it.
+- Before staging a file I edited, run `git diff <file>` and check every hunk is mine. `CHANGELOG.md` and `.ai/todo.md` are the usual suspects: several sessions append to them.
+- `git add -p` is unavailable here. To commit part of a file, write the version I want, stage it, then restore the other hunks to the working tree (see the rebuild of `483fb431`).
+- More than one session commits in this working tree. Check `git log <last-known>..HEAD` before committing, and confirm another commit did not take my hunks.
+
+## Look at the screen, not only the tests
+
+- The phone project modal passed 41 unit tests and 6 e2e tests, and still hid the corner FloatingDock: the new layer sat at `z-30` over the dock's `z-10`. Only a screenshot showed it.
+- For layout work, capture the real screens (a throwaway Playwright spec on the e2e mock harness works) and compare them with what the user had before. Then add a guard for what the screenshot caught.
+- The e2e mock preferences use `zoom_level: 1.0`, but the field is a percentage (50–200), so the harness renders at 50%. Override `zoom_level` / `mobile_zoom_level` to 100 for true-size screenshots.

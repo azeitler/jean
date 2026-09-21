@@ -1,3 +1,44 @@
+# Mobile: Usage tab, Settings from the Home gear
+
+- [x] Tab `settings` → `usage`: `MobileUsageTab` is `UsagePane` only; `UsageTabIcon` = chart glyph in the usage ring.
+- [x] Gear top right on Home (`MobileTabPage` `action` slot) pushes `MobileSettingsPage` (updates, panes, About); update dot on the gear.
+- [x] Settings page renders in the shell, not a portal, so the Preferences dialog lands above it (e2e checks the topmost element).
+
+## Review
+
+- 374/374 unit files; e2e 39 passed, 2 skipped; lint, types clean. Live run 5/5, ring 79% on the Usage tab.
+
+# Mobile: Settings tab, title bar is only the title
+
+- [x] Fourth tab `settings` (TS type, persistence already string-based in Rust).
+- [x] `SettingsUsageIcon`: gear inside a usage ring (`usePeakUsage`, severity colour), update dot.
+- [x] `MobileSettingsTab`: updates, usage (`UsagePane`), Preferences panes (`getMobileNavigationGroups`, moved to `preferences-navigation.ts` to keep the dialog lazy), About.
+- [x] Phone `TitleBar`: early return with the title only; zen exit stays.
+- [x] Unread bell → Home Unread section + Home badge; `useRefreshSessionsOnOpen` extracted so History/Unread stay fresh.
+- [x] File browser toggle → phone session header; header buttons 44px.
+
+## Review
+
+- 374/374 unit test files; e2e 38 passed, 2 skipped; lint and types clean.
+- Live run on the real backend (390×844): 7/7. Ring showed Claude Weekly 78% in amber; Home badge 26 = 26 Unread rows.
+
+# Mobile navigation: three tabs, projects as modals, sessions push
+
+Decisions: History = recently opened sessions (`last_opened_at`); Home = Continue row + projects; search = floating round button bottom right; drawer retired in one step.
+
+- [x] Persist `mobile_active_tab` (TS `UIState`, Rust `UIState` + round-trip test, snapshot, restore, save subscription).
+- [x] `src/components/mobile/`: `MobileTabShell`, floating `MobileTabBar` + detached search button, `MobileHomeTab` / `MobileStarredTab` / `MobileHistoryTab`, `MobileProjectLayer`.
+- [x] Stack derived from `selectedProjectId` / `sessionChatModalOpen`, no new store. Layer entry `modal` (project opened) vs `push` (session opened from a tab: click-through, canvas invisible, back returns to the tab).
+- [x] `SessionChatModal`: slide-in from the right, back chevron on phones. `ProjectCanvasView`: `mobilePresentation` + `onDismiss`.
+- [x] Retire `MobileLeftSidebar`, the sidebar swipe and the phone title-bar sidebar button; dock hidden at the tab root only.
+- [x] Tests: 41 unit tests in `src/components/mobile/`, tab persistence, routing, dock visibility; `e2e/tests/mobile-navigation.spec.ts` (first phone-viewport e2e).
+
+## Review
+
+- 371/373 unit test files pass (2 pre-existing model-picker failures); e2e 36 passed, 2 skipped (existing fixme); lint, types, jean-core clippy and fmt clean.
+- Screenshots at 390×844 caught one regression the tests missed: the project layer at `z-30` hid the corner dock. Restacked to `z-[2]` under the dock `z-10`, with a guard test.
+- Mutation-checked the two load-bearing guards (project-switch blip, dock stacking): both tests fail without the fix.
+
 # Chat markdown: relative paths in the canvas session modal (#19)
 
 - [x] `LocalPathRootContext` in `chat-links.ts`; `resolveLocalPath` / `openChatLink` take a root path, store as fallback.
