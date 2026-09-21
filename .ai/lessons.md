@@ -260,3 +260,8 @@ null)`. Writing with `setItem` and reading it back returns `null`, so a test
 - The phone project modal passed 41 unit tests and 6 e2e tests, and still hid the corner FloatingDock: the new layer sat at `z-30` over the dock's `z-10`. Only a screenshot showed it.
 - For layout work, capture the real screens (a throwaway Playwright spec on the e2e mock harness works) and compare them with what the user had before. Then add a guard for what the screenshot caught.
 - The e2e mock preferences use `zoom_level: 1.0`, but the field is a percentage (50–200), so the harness renders at 50%. Override `zoom_level` / `mobile_zoom_level` to 100 for true-size screenshots.
+
+## Kill a Claude turn only after the finished tool call is on disk
+
+- The live parser and the history rebuild read the same run log, but not the same lines: the parser sees `stream_event` chunks, `run_log::parse_run_to_message` reads only finished `assistant` lines. Killing the CLI on the last streamed chunk (the "complete input" fix for the empty-plan bug) could land before the CLI wrote the `assistant` line, so the question survived live and vanished on every rebuild (azeitler/jean#32).
+- A fix is not verified until both consumers agree. For any change to when Jean stops a CLI, replay a real stream (`scripts/claude-dialog-rig/replay_kill_paths.py`) and check that the run log up to the kill point rebuilds the same tool call the live view showed.
