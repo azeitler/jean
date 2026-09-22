@@ -1,3 +1,15 @@
+# Mobile: no title bar, lower tab bar, Home switch, no CLI alerts
+
+- [x] Phone title bar only in zen; content offset by `--safe-area-top`; project name moved into the session header.
+- [x] Tab bar: `px-5`, `pb-[max(0.5rem, safe-bottom − 0.75rem)]` → 22pt/20pt on an iPhone, concentric with the corners.
+- [x] `useCliVersionCheck` skipped on phones; effect bails out explicitly (shared query cache with Preferences).
+- [x] Home: Continue first, then Sessions / Projects switch (`mobileHomeSegment`, not persisted); Recent excludes Unread and Continue.
+
+## Review
+
+- 375/375 unit files; e2e 40 passed, 2 skipped (with `--workers=2`: the machine ran at load 235, default workers timed out unrelated specs). Mutation-checked the CLI effect gate.
+- Live run with iPhone insets injected: 0 title bars, Continue above the switch, pill 22px from the bottom and 20px from the sides, project name in the session header. The host now offers a real JeanZ update (z.15), so yesterday's feed fix is live.
+
 # Mobile: Usage tab, Settings from the Home gear
 
 - [x] Tab `settings` → `usage`: `MobileUsageTab` is `UsagePane` only; `UsageTabIcon` = chart glyph in the usage ring.
