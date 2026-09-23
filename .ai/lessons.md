@@ -289,3 +289,9 @@ null)`. Writing with `setItem` and reading it back returns `null`, so a test
 - Building a staged blob from `git show HEAD:<path>` and committing it later reverted two commits that had landed in between. The index was captured against an older HEAD, so the commit carried stale content for four files it never meant to touch.
 - In a repo other Jean sessions write to, treat HEAD as volatile: re-read `git log -1` right before committing, prefer staging from the working tree over a remembered HEAD, and read `git show --stat HEAD` afterwards. The stat named eight files where four were expected, which is the only thing that caught it.
 - The repair is `git reset --mixed <real tip>` — it rewinds the branch and the index and leaves the working tree alone, so the merged content survives and can be re-committed. Never `git reset --hard` here.
+
+## Never `git stash` in a working tree another session shares
+
+- To decide whether two failing tests were pre-existing, I stashed the whole tree, ran them against HEAD, and popped. For those seconds another session's entire uncommitted feature was gone from disk while it was working. It survived, but nothing about that was guaranteed — a pop conflicts, or the other session reads a file mid-stash and sees HEAD.
+- To attribute a failure that is not in my own files, do not move the tree. Read `git diff --name-only` and check whether the failing test's subject is in someone else's hunks, or run the test from a throwaway `git worktree` on HEAD.
+- `git commit -- <paths>` is the right shape for committing into a shared tree — it takes the working-tree content of those paths and leaves the rest of the index alone — but it rejects an untracked path, so `git add` must come first. Put both in one command so the window where my files sit staged is milliseconds. Options go before `--`: `git commit -F msg -- a b c`, never `git commit -- a b c -F msg`, where git reads `-F` as a pathspec.
