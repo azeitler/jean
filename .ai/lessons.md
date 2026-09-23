@@ -271,3 +271,15 @@ null)`. Writing with `setItem` and reading it back returns `null`, so a test
 - The upstream 1.0.1 merge (1cf20d58) passed every test and still broke the desktop app with remote servers: local command results got `local:` ids, so one session lived under two cache keys (answers missing, answers above questions, pinned rows switching on and off). It was reverted in 0.1.73-z.14.
 - For a merge that changes routing, ids or transport: keep it on a branch, run the real desktop app with the user's remote servers enabled, and let an agent run in a pinned session before the merge reaches `main`. Web Access alone does not show it, because only the native main window combines servers.
 - A JeanZ release cannot be undone by the updater: semver treats a lower upstream base (0.1.73 after 1.0.1) as older, so installed copies need a manual DMG install.
+
+## The shell is zsh: an unquoted variable is one word
+
+- `git add -- $FILES` with `FILES="a b c"` passed a single path in zsh, which does not split unquoted variables the way bash does. `git add` failed, the script carried on, and the commit held only the CHANGELOG. Caught from the commit stat and fixed with an amend.
+- Use an array — `FILES=(a b c)` and `"${FILES[@]}"` — and end every critical step with `|| exit 1`, not `set -e` alone.
+- After any scripted commit, read `git show --stat HEAD` before reporting it.
+
+## Radix menu items select on a pointerup they never saw a pointerdown for
+
+- `MenuItem` calls `event.currentTarget.click()` on any `pointerup` it did not receive a matching `pointerdown` for. That is press-drag-release, right for a dropdown and wrong for a context menu: the press that opened the menu landed on the trigger, so the release always matches, and an item sitting under the cursor runs without being chosen.
+- To suppress one Radix behaviour without forking the primitive, pass the same handler as a prop and call `preventDefault()`. `composeEventHandlers` runs the caller's handler first and skips its own when the event is default-prevented — that is what `checkForDefaultPrevented` is for.
+- `Presence` sits _inside_ `ContextMenuPrimitive.Portal`, so a shadcn `ContextMenuContent` wrapper never unmounts — only its children do. Per-open state has to live in a component rendered below that boundary, or it leaks from one opening into the next. A mount-lifecycle probe (`useEffect` logging mount/unmount) settles this in a minute; guessing does not.
