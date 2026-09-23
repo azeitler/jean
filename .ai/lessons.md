@@ -283,3 +283,9 @@ null)`. Writing with `setItem` and reading it back returns `null`, so a test
 - `MenuItem` calls `event.currentTarget.click()` on any `pointerup` it did not receive a matching `pointerdown` for. That is press-drag-release, right for a dropdown and wrong for a context menu: the press that opened the menu landed on the trigger, so the release always matches, and an item sitting under the cursor runs without being chosen.
 - To suppress one Radix behaviour without forking the primitive, pass the same handler as a prop and call `preventDefault()`. `composeEventHandlers` runs the caller's handler first and skips its own when the event is default-prevented — that is what `checkForDefaultPrevented` is for.
 - `Presence` sits _inside_ `ContextMenuPrimitive.Portal`, so a shadcn `ContextMenuContent` wrapper never unmounts — only its children do. Per-open state has to live in a component rendered below that boundary, or it leaks from one opening into the next. A mount-lifecycle probe (`useEffect` logging mount/unmount) settles this in a minute; guessing does not.
+
+## Another session can commit while you are staging
+
+- Building a staged blob from `git show HEAD:<path>` and committing it later reverted two commits that had landed in between. The index was captured against an older HEAD, so the commit carried stale content for four files it never meant to touch.
+- In a repo other Jean sessions write to, treat HEAD as volatile: re-read `git log -1` right before committing, prefer staging from the working tree over a remembered HEAD, and read `git show --stat HEAD` afterwards. The stat named eight files where four were expected, which is the only thing that caught it.
+- The repair is `git reset --mixed <real tip>` — it rewinds the branch and the index and leaves the working tree alone, so the merged content survives and can be re-committed. Never `git reset --hard` here.
