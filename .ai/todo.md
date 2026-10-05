@@ -676,3 +676,16 @@ Nothing checked the file existed, so a dead reference looked like a live link.
 - [x] Rust + TS tests, docs, changelog
 - [x] Proof: 6 Rust tests, 26 frontend tests. 2928 frontend tests pass apart
       from the 3 model-picker failures that predate this work.
+
+## Close "Recent activity" behind a click (2026-10-01)
+
+The feed on Home and the project home showed little more than "Session
+finished" rows and took a full Home column. Kept the feed and the backend log;
+the section is closed by default.
+
+- [x] `RecentActivitySection`: heading is a toggle, feed mounts only when open
+      (no fetch while closed). Open state is component state, not persisted.
+- [x] `HomeView`: activity moves under Recent sessions; grid is two columns
+- [x] Tests (`HomeView`, `ProjectHomeColumns`), changelog
+- [x] Proof: 86 tests in `components/home` + `components/dashboard` pass,
+      `tsc --noEmit` clean, eslint clean on the changed files.
