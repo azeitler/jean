@@ -689,3 +689,18 @@ the section is closed by default.
 - [x] Tests (`HomeView`, `ProjectHomeColumns`), changelog
 - [x] Proof: 86 tests in `components/home` + `components/dashboard` pass,
       `tsc --noEmit` clean, eslint clean on the changed files.
+
+## Answer to a Claude question is lost (2026-10-01)
+
+A `permission_prompt` request from the dialog shim can park after the
+blocking-tool kill released the session. `resolve` then reported `true` for a
+dead turn, so the UI skipped the follow-up message and stayed on "sending"
+(session `c6ed9772`, tool `toolu_01J77LR2xS4xBGvKSCvh78aV`).
+
+- [x] Failing tests in `claude_dialog.rs` (dead turn, live turn, nothing parked)
+- [x] `claude_dialog::resolve_live`: deliver only when the session has a
+      registered process; otherwise deny the orphan waiter and report `false`
+- [x] `answer_claude_dialog` uses it and logs the result
+- [x] Changelog
+- [x] Proof: `cargo test --lib -- claude_dialog jean_mcp_socket` 17 pass.
+- [ ] Manual check in the app (several questions in a row)
