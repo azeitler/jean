@@ -1,3 +1,17 @@
+# Remote hosts with many projects: server stalls, errors read as "empty"
+
+- [x] WS dispatch: every command on the blocking pool (tokio workers stay free for heartbeats).
+- [x] `fetch_worktrees_status`: one process-wide pool of 8 git workers, de-duplicated queue; one locked update per worktree (`update_projects_data`).
+- [x] `update_worktree_cached_status`: skip the projects.json rewrite when nothing changed.
+- [x] CLI status/auth queries rethrow; `useInstalledBackends.isUnknown`; banner, welcome screen, sidebar and magic-prompt defaults ignore unknown checks.
+- [x] Projects load failure: Retry instead of Welcome / "No projects found".
+
+## Review
+
+- mb16 reproduction (before): trivial `load_preferences` 2–50 s during a startup burst, some never answered.
+- Local synthetic host (66 repos, 330 worktrees, `scratch/wsstress.ts`): before p95 1.52 s / max 2.95 s, after p95 0.01 s / max 0.01 s. All 330 statuses persisted.
+- `bun run check:all` green. mb16 retest needs the new build installed there.
+
 # Mobile: no title bar, lower tab bar, Home switch, no CLI alerts
 
 - [x] Phone title bar only in zen; content offset by `--safe-area-top`; project name moved into the session header.
