@@ -301,3 +301,10 @@ null)`. Writing with `setItem` and reading it back returns `null`, so a test
 - The tree was committed with Prettier 3.6 and the lockfile now installs 3.8, whose defaults differ. `bun run format` after a four-file change produced a 157-file, 20k-line diff, including a 19k-line vendored JS bundle — my own change was buried in it. `format:check` fails repo-wide at HEAD, so a clean run proves nothing about your edits.
 - Never run the repo-wide formatter to tidy an edit. Write the code in the style of the lines around it, then verify with `bunx prettier --check <the files you touched>`. If one warns, diff it against `git show HEAD:<path>` piped through the same check — a file that already failed at HEAD is drift, not your doing.
 - Recovering costs more than the tidy was worth: `git diff --name-only` minus your own paths, then `tr '\n' '\0' | xargs -0 git checkout --` (macOS `xargs` has no `-a`). Your own files still carry the reformatting, so revert those too and re-apply the edits by hand.
+
+## Find every place that derives a status before calling a status fix done
+
+- A status bug can show in several views that each compute it. Fixing the shared helper does not fix a view that keeps its own copy of the logic.
+- Before you fix a displayed status, grep for every consumer of the raw inputs (for example `waitingForInputSessionIds`, `waiting_for_input`) and list each view that shows the status: session rows, workspace row dot, project row, canvas, tabs.
+- Make aggregate indicators derive from the per-item status helper (`computeSessionCardData`) instead of re-reading raw flags.
+- Write a regression test against the view the user named ("the tree"), not only against the helper.
