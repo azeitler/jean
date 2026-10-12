@@ -308,3 +308,9 @@ null)`. Writing with `setItem` and reading it back returns `null`, so a test
 - Before you fix a displayed status, grep for every consumer of the raw inputs (for example `waitingForInputSessionIds`, `waiting_for_input`) and list each view that shows the status: session rows, workspace row dot, project row, canvas, tabs.
 - Make aggregate indicators derive from the per-item status helper (`computeSessionCardData`) instead of re-reading raw flags.
 - Write a regression test against the view the user named ("the tree"), not only against the helper.
+
+## Check real session data before calling a session-state bug fixed
+
+- A unit test on one helper does not prove the user-visible bug is gone. Before shipping, read the persisted run metadata (`sessions/data/<id>/metadata.json`) and the live process arguments (`ps`) for the failing pattern.
+- For "lost context" bugs, list each run's resume id next to the previous run's. A changed or missing id after a cancel shows the exact path that dropped it.
+- Prefer making the invariant structural (Jean picks and saves the id before the spawn) over patching each place that might clear it.
