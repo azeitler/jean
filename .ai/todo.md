@@ -718,3 +718,12 @@ dead turn, so the UI skipped the follow-up message and stayed on "sending"
 - [x] Changelog
 - [x] Proof: `cargo test --lib -- claude_dialog jean_mcp_socket` 17 pass.
 - [ ] Manual check in the app (several questions in a row)
+
+## 2026-10-13 Sidebar drag handle + sluggishness (A+B)
+
+- [x] Project/folder drag starts only from the header row (`dragHandle`)
+- [x] `list_all_sessions` skips archived worktrees
+- [x] Hot `sessions` invalidations carry `worktreeIds`; frontend refreshes only those worktrees
+- [x] `WorktreeItem` / `WorktreeList` subscribe to their own sessions only (`useSessionsCardStoreState`)
+- [x] Proof: `bun run check:all` parts green (typecheck, lint, fmt, clippy, 384 TS test files, Rust tests)
+- [ ] Manual check on the slow Mac
