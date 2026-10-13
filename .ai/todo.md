@@ -727,3 +727,10 @@ dead turn, so the UI skipped the follow-up message and stayed on "sending"
 - [x] `WorktreeItem` / `WorktreeList` subscribe to their own sessions only (`useSessionsCardStoreState`)
 - [x] Proof: `bun run check:all` parts green (typecheck, lint, fmt, clippy, 384 TS test files, Rust tests)
 - [ ] Manual check on the slow Mac
+
+## 2026-10-13 Lean C
+
+- [x] C1: session summary cache keyed by metadata.json mtime + size (`load_session_summary`)
+- [x] C2: status sweep skips the projects.json write when counts are unchanged
+- [x] Proof: `bun run check:all` green, 2 new Rust tests
+- [ ] Manual check on the slow Mac
