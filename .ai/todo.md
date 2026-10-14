@@ -734,3 +734,11 @@ dead turn, so the UI skipped the follow-up message and stayed on "sending"
 - [x] C2: status sweep skips the projects.json write when counts are unchanged
 - [x] Proof: `bun run check:all` green, 2 new Rust tests
 - [ ] Manual check on the slow Mac
+
+## 2026-10-13 Image viewer: mobile layout + pinch zoom
+
+- [x] `react-zoom-pan-pinch` 4.2.0 in `ImagePreviewDialog` (pinch, double-tap, wheel, pan)
+- [x] Mobile: full screen, image centered, safe-area padding for close/Reveal
+- [x] Test `ImageLightbox.test.tsx`, changelog
+- [x] Proof: `bun run check:all` green; Playwright 390×844 + 1280×800 screenshots, pinch → scale 2.5, wheel → scale 8
+- [ ] Manual pinch on a real phone (web access)
