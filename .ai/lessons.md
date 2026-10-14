@@ -314,3 +314,13 @@ null)`. Writing with `setItem` and reading it back returns `null`, so a test
 - A unit test on one helper does not prove the user-visible bug is gone. Before shipping, read the persisted run metadata (`sessions/data/<id>/metadata.json`) and the live process arguments (`ps`) for the failing pattern.
 - For "lost context" bugs, list each run's resume id next to the previous run's. A changed or missing id after a cancel shows the exact path that dropped it.
 - Prefer making the invariant structural (Jean picks and saves the id before the spawn) over patching each place that might clear it.
+
+## Check memory for the user's UI vocabulary before scoping
+
+- The user calls the Jean title bar "menu bar" and also "toolbar". A memory note said so, but I scoped a macOS menu-bar job from the word alone.
+- Before offering scope options that name a UI area, check memory notes for that word and name the exact component (`TitleBar.tsx` vs. the macOS menu) in the option text.
+
+## A mockup approves everything it shows
+
+- The unified-toolbar mockups also drew macOS-style sidebar rows. The spec scoped only the chrome, and I left the rows out silently. The user saw that gap after the build.
+- Before writing a spec from approved mockups, list every visible difference between mockup and current UI, and mark each one in scope or out of scope in the spec. Ask about each one that is unclear.

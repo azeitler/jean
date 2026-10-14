@@ -1,3 +1,29 @@
+# Desktop: Mac-style unified toolbar (spec 2026-10-14-unified-toolbar-design.md)
+
+- [x] Shell: `toolbar-slots.tsx` (portal slots, newest owner wins), `WindowToolbar`, `SidebarHeader`/`SidebarFooter`, `UpdatesButton`, 52pt height, traffic lights centred (`trafficLightPosition`).
+- [x] Home, project canvas, session modal fill the toolbar; phone keeps its headers (`useHasWindowToolbar`).
+- [x] Narrow toolbar: labels (`data-toolbar-label`) hide < 1000px; title keeps 16rem.
+- [x] Tests: slots, toolbar, footer, Home, wiring; e2e `window-toolbar.spec.ts`; migrated 4 source tests + 2 e2e specs.
+
+## Review
+
+- `bun run check:all` green (393 files); e2e 45 passed, 2 skipped.
+- Live (dev build, demo repo): Home, canvas, session, sidebar hidden, zen captured. Not verified live: narrow container-query steps (window min width 1000; sidebar drag failed in automation), Windows, Linux.
+
+# macOS: menu bar, dock badge + menu, notification clicks
+
+- [x] Menu built in `app_menu.rs`; `kb:`/`cmd:` ids; accelerators follow keybindings (`set_menu_accelerators`); File/Go/Session/Help; custom Minimize (Cmd+M stays Magic Menu).
+- [x] Key-originated menu duplicates dropped (`isMenuEventFromPassedKey`), except actions that must work from terminals.
+- [x] Dock badge = unread count; dock menu via `applicationDockMenu:` added to tao's delegate (`dock.rs`, `useDockSync`).
+- [x] Notification click opens session (plugin 2.6 `on_action`; pulled Tauri 2.10 → 2.12); one dock bounce for "needs input".
+- [x] Zen → Ctrl+Cmd+Z on macOS native; client-stored keybindings now migrated too.
+
+## Review
+
+- `bun run check:all` green (388 files); Rust 34 tests.
+- Live (dev build): menu dump shows user shortcuts incl. ⌃⌘Z; menu click and Cmd+B toggle sidebar once; Ctrl+Cmd+Z toggles zen; Cmd+M no minimize; dock menu shows New Worktree.
+- Not verified live: badge number and session entries (empty dev profile), notification click (needs a background run).
+
 # Remote hosts with many projects: server stalls, errors read as "empty"
 
 - [x] WS dispatch: every command on the blocking pool (tokio workers stay free for heartbeats).
