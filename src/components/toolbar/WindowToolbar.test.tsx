@@ -1,13 +1,27 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@/test/test-utils'
 import { useUIStore } from '@/store/ui-store'
-import { ToolbarSlotsProvider } from './toolbar-slots'
+import { ToolbarContent, ToolbarSlotsProvider } from './toolbar-slots'
 import { WindowToolbar } from './WindowToolbar'
 
 const platform = vi.hoisted(() => ({
   native: true,
   mac: true,
   linux: false,
+}))
+
+const remote = vi.hoisted(() => ({
+  connection: null as null | {
+    id: string
+    name: string
+    url: string
+    token: string
+  },
+}))
+
+vi.mock('@/lib/remote-connections', async importOriginal => ({
+  ...(await importOriginal<object>()),
+  useActiveRemoteConnection: () => remote.connection,
 }))
 
 vi.mock('@/lib/environment', async importOriginal => ({
@@ -45,13 +59,13 @@ function renderToolbar() {
 }
 
 const toolbar = () => screen.getByTestId('window-toolbar')
-const hasInset = () =>
-  toolbar().querySelector('.w-\\[78px\\]') !== null
+const hasInset = () => toolbar().querySelector('.w-\\[78px\\]') !== null
 
 describe('WindowToolbar', () => {
   beforeEach(() => {
     Object.assign(platform, { native: true, mac: true, linux: false })
     useUIStore.setState({ zenMode: false, leftSidebarVisible: true })
+    remote.connection = null
   })
 
   it('leaves the traffic lights to the sidebar while it shows', () => {
@@ -102,5 +116,41 @@ describe('WindowToolbar', () => {
     Object.assign(platform, { mac: false, linux: true })
     renderToolbar()
     expect(screen.getByTestId('linux-controls')).toBeInTheDocument()
+  })
+
+  it('shows no remote badge in the local window', () => {
+    renderToolbar()
+    expect(screen.queryByTestId('remote-instance-badge')).toBeNull()
+  })
+
+  // The regression: the remote name lived only in the fallback title, and every
+  // view that fills the title slot hid it, so a remote window looked local.
+  it('names the remote instance even while a view owns the title', () => {
+    remote.connection = {
+      id: 'r1',
+      name: 'mb16',
+      url: 'http://mb16.tailnet:3456',
+      token: 't',
+    }
+    render(
+      <ToolbarSlotsProvider>
+        <WindowToolbar fallbackTitle="mb16 › jean" />
+        <ToolbarContent title="jean project" />
+      </ToolbarSlotsProvider>
+    )
+    expect(screen.queryByText('mb16 › jean')).toBeNull()
+    expect(screen.getByTestId('remote-instance-badge')).toHaveTextContent(
+      'mb16'
+    )
+    expect(screen.getByLabelText('Remote instance mb16')).toBeInTheDocument()
+  })
+
+  it('keeps the remote badge in zen', () => {
+    remote.connection = { id: 'r1', name: 'mb16', url: 'not a url', token: 't' }
+    useUIStore.setState({ zenMode: true, leftSidebarVisible: false })
+    renderToolbar()
+    expect(screen.getByTestId('remote-instance-badge')).toHaveTextContent(
+      'mb16'
+    )
   })
 })
